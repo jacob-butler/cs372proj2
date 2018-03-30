@@ -71,6 +71,7 @@ std::string Polygon::to_postscript() const
 	double y_shift = m_side_length/(2*std::tan(M_PI/(double)m_num_sides));
 	double x_shift = m_side_length/2;
 	return "gsave\n"
+			"0 " + std::to_string(-get_height()/2 + y_shift) + " translate\n" 
 			"0 " + std::to_string(360/(double)m_num_sides) + " 360 {\n"
 			"  newpath\n"
 			"  gsave\n"

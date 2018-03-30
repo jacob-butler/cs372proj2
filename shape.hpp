@@ -3,6 +3,10 @@
 // Base class Shape 
 
 #include <string>
+#include <memory>
+#include <cmath>
+#include <fstream>
+#include <iostream>
 
 class Shape {
 public:
@@ -13,6 +17,7 @@ public:
 	double get_height() const;
 	void set_width(double width);
 	void set_height(double height);
+	void generate_postscript_file(std::string file_name);
 private:
     double m_width;
     double m_height;
@@ -34,7 +39,7 @@ class Polygon : public Shape
 public:
 	Polygon() = default;
 	Polygon(int num_sides, double side_length);
-	~Polygon() = default;
+	virtual ~Polygon() = default;
 	std::string to_postscript() const;
 private:
 	int m_num_sides;

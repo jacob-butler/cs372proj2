@@ -1,10 +1,21 @@
-39.000000 39.000000 translate
+57.650635 61.000000 translate
 
 gsave
-newpath 
-  0 0 3.000000 0 360 arc 
-  stroke 
-closepath
+90 rotate
+gsave
+0 -7.216878 translate
+0 120.000000 360 {
+  newpath
+  gsave
+    rotate
+    -25.000000 -14.433757 moveto
+    25.000000 -14.433757 lineto
+    stroke
+  grestore
+  closepath
+}for
+grestore
+-90 rotate
 grestore
 
 showpage

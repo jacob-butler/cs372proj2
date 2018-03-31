@@ -102,3 +102,26 @@ std::string Rectangle::to_postscript() const
 				"  stroke\n"
 				"Shape.get_width() + 36grestore\n";
 }
+
+Rotated::Rotated(std::unique_ptr<Shape> shape, RotationAngle rotation_angle):Shape(0,0), m_rot(rotation_angle), m_shape(shape->clone())
+{
+	if (rotation_angle == HALF)
+	{
+		set_width(m_shape->get_width());
+		set_height(m_shape->get_height());
+	}
+	else
+	{
+		set_width(m_shape->get_height());
+		set_height(m_shape->get_width());
+	}
+}
+
+std::string Rotated::to_postscript() const
+{
+	return "gsave\n"
+		+ std::to_string(m_rot) + " rotate\n"
+		+ m_shape->to_postscript()
+		+ "-" + std::to_string(m_rot) + " rotate\n"
+		"grestore\n";
+}

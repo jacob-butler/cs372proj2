@@ -16,7 +16,7 @@ void Shape::generate_postscript_file(std::string file_name)
 									std::to_string(get_height()/2 + 36) + " translate\n\n" +
 									to_postscript() + "\nshowpage";
 	std::fstream open_file(file_name + ".ps", std::fstream::trunc | std::fstream::in | std::fstream::out);
-	//std::fstream open_file(file_name + ".ps", open_file.trunc | open_file.in | open_file.out);
+
 	if (!open_file.is_open()) 
 	{
     	std::cout << "file failed to open" << file_name + ".ps" << std::endl;
@@ -72,6 +72,7 @@ std::string Polygon::to_postscript() const
 	double y_shift = m_side_length/(2*std::tan(M_PI/(double)m_num_sides));
 	double x_shift = m_side_length/2;
 	return "gsave\n"
+			"0 " + std::to_string(-get_height()/2 + y_shift) + " translate\n" 
 			"0 " + std::to_string(360/(double)m_num_sides) + " 360 {\n"
 			"  newpath\n"
 			"  gsave\n"

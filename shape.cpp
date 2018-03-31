@@ -15,7 +15,8 @@ void Shape::generate_postscript_file(std::string file_name)
 	std::string output_postscript = std::to_string(get_width()/2 + 36) + " " +
 									std::to_string(get_height()/2 + 36) + " translate\n\n" +
 									to_postscript() + "\nshowpage";
-	std::fstream open_file(file_name + ".ps", open_file.trunc | open_file.in | open_file.out);
+	std::fstream open_file(file_name + ".ps", std::fstream::trunc | std::fstream::in | std::fstream::out);
+	//std::fstream open_file(file_name + ".ps", open_file.trunc | open_file.in | open_file.out);
 	if (!open_file.is_open()) 
 	{
     	std::cout << "file failed to open" << file_name + ".ps" << std::endl;

@@ -3,16 +3,17 @@
 // Base class Shape 
 
 #include <string>
+#include <vector>
 #include <memory>
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <initializer_list>
 
 class Shape {
 public:
     Shape(double width, double height);
     virtual ~Shape() = default;
-	virtual Shape* clone() const = 0;
     virtual std::string to_postscript() const = 0;
 	double get_width() const;
 	double get_height() const;
@@ -30,7 +31,6 @@ public:
 	Circle() = default;
 	Circle(double radius);
 	~Circle() = default;
-	virtual Circle* clone() const { return new Circle(*this); }
 	std::string to_postscript() const;
 private:
 	double m_radius;
@@ -42,7 +42,6 @@ public:
 	Polygon() = default;
 	Polygon(int num_sides, double side_length);
 	virtual ~Polygon() = default;
-	virtual Polygon* clone() const { return new Polygon(*this); }
 	std::string to_postscript() const;
 private:
 	int m_num_sides;
@@ -56,8 +55,35 @@ public:
 	Rectangle() = default;
 	Rectangle(double width, double height): Shape(width, height){}
 	~Rectangle() = default;
-	virtual Rectangle* clone() const { return new Rectangle(*this); }
 	std::string to_postscript() const;
+private:
+};
+
+class Spacer : public Shape
+{
+public:
+	Spacer() = default;
+	Spacer(double width, double height): Shape(width, height){}
+	~Spacer() = default;
+	std::string to_postscript() const;
+private:
+};
+
+class Square : public Polygon
+{
+public:
+	Square() = default;
+	Square(double side_length): Polygon(4, side_length){}
+	~Square() = default;
+private:
+};
+
+class Triangle : public Polygon
+{
+public:
+	Triangle() = default;
+	Triangle(double side_length): Polygon(3, side_length){}
+	~Triangle() = default;
 private:
 };
 
@@ -66,11 +92,56 @@ class Rotated : public Shape
 public:
 	enum RotationAngle { QUARTER = 90, HALF = 180, THREE_QUARTER = 270 };
 	Rotated() = default;
-	Rotated(std::unique_ptr<Shape> shape, RotationAngle rotation_angle);
+	Rotated(std::shared_ptr<Shape> shape, RotationAngle rotation_angle);
 	~Rotated() = default;
-	virtual Rotated* clone() const { return new Rotated(*this); }
 	std::string to_postscript() const;
 private:
 	RotationAngle m_rot;
-	Shape* m_shape;
+	std::shared_ptr<Shape> m_shape;
+};
+
+class Scaled : public Shape
+{
+public:
+	Scaled() = default;
+	Scaled(std::shared_ptr<Shape> shape, double fx, double fy);
+	~Scaled() = default;
+	std::string to_postscript() const;
+private:
+	std::shared_ptr<Shape> m_shape;
+	double m_fx; 
+	double m_fy;
+};
+
+class Layered : public Shape
+{
+public:
+	Layered() = default;
+	Layered(std::initializer_list<std::shared_ptr<Shape>> shapes);
+	~Layered() = default;
+	std::string to_postscript() const;
+private:
+	std::vector<std::shared_ptr<Shape>> m_shapes;
+};
+
+class Virtical : public Shape
+{
+public:
+	Virtical() = default;
+	Virtical(std::initializer_list<std::shared_ptr<Shape>> shapes);
+	~Virtical() = default;
+	std::string to_postscript() const;
+private:
+	std::vector<std::shared_ptr<Shape>> m_shapes;
+};
+
+class Horizontal : public Shape
+{
+public:
+	Horizontal() = default;
+	Horizontal(std::initializer_list<std::shared_ptr<Shape>> shapes);
+	~Horizontal() = default;
+	std::string to_postscript() const;
+private:
+	std::vector<std::shared_ptr<Shape>> m_shapes;
 };

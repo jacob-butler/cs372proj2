@@ -103,7 +103,13 @@ std::string Rectangle::to_postscript() const
 				"Shape.get_width() + 36grestore\n";
 }
 
-Rotated::Rotated(std::unique_ptr<Shape> shape, RotationAngle rotation_angle):Shape(0,0), m_rot(rotation_angle), m_shape(shape->clone())
+std::string Spacer::to_postscript() const
+{
+	return "";
+}
+
+Rotated::Rotated(std::shared_ptr<Shape> shape, RotationAngle rotation_angle)
+	:Shape(0,0), m_rot{rotation_angle}, m_shape{std::move(shape)}
 {
 	if (rotation_angle == HALF)
 	{
@@ -124,4 +130,103 @@ std::string Rotated::to_postscript() const
 		+ m_shape->to_postscript()
 		+ "-" + std::to_string(m_rot) + " rotate\n"
 		"grestore\n";
+}
+
+Scaled::Scaled(std::shared_ptr<Shape> shape, double fx, double fy)
+	:Shape(0,0), m_shape{std::move(shape)}, m_fx{fx}, m_fy{fy}
+{
+	{
+		set_width(m_shape->get_width()*fx);
+		set_height(m_shape->get_height()*fy);
+	}
+}
+
+std::string Scaled::to_postscript() const
+{
+	return "gsave\n"
+		+ std::to_string(m_fx) + " " + std::to_string(m_fy) + " scale\n"
+		+ m_shape->to_postscript() +
+		"grestore\n";
+}
+
+Layered::Layered(std::initializer_list<std::shared_ptr<Shape>> shapes)
+	:Shape(0,0), m_shapes(std::move(shapes))
+{
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
+	{
+		if(get_width() < m_shapes[i]->get_width())
+			set_width(m_shapes[i]->get_width());
+		if(get_height() < m_shapes[i]->get_height())
+			set_height(m_shapes[i]->get_height());
+	}
+}
+
+std::string Layered::to_postscript() const
+{
+	std::cout << get_width() << std::endl;
+	std::cout << get_height() << std::endl;
+	std::string outputString = "";
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
+	{
+		outputString += "gsave\n" +
+			m_shapes[i]->to_postscript() +
+		"grestore\n";
+	}
+	return outputString;
+}
+
+Virtical::Virtical(std::initializer_list<std::shared_ptr<Shape>> shapes)
+	:Shape(0,0), m_shapes(std::move(shapes))
+{
+	double total_height = 0;
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
+	{
+		if(get_width() < m_shapes[i]->get_width())
+			set_width(m_shapes[i]->get_width());
+		total_height += m_shapes[i]->get_height();
+	}
+	set_height(total_height);
+}
+
+std::string Virtical::to_postscript() const
+{
+	std::string outputString = "";
+	double total_height_drawn = 0;
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
+	{
+		outputString += "gsave\n" 
+		"0 " + std::to_string(-get_height()/2 + m_shapes[i]->get_height()/2+total_height_drawn) + " translate\n" +
+		m_shapes[i]->to_postscript() +
+		"grestore\n";
+		total_height_drawn += m_shapes[i]->get_height();
+	}
+	return outputString;
+}
+
+Horizontal::Horizontal(std::initializer_list<std::shared_ptr<Shape>> shapes)
+	:Shape(0,0), m_shapes(std::move(shapes))
+{
+	double total_width = 0;
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
+	{
+		if(get_height() < m_shapes[i]->get_height())
+			set_height(m_shapes[i]->get_height());
+		total_width += m_shapes[i]->get_width();
+	}
+	set_width(total_width);
+}
+
+std::string Horizontal::to_postscript() const
+{
+	std::string outputString = "";
+	double total_width_drawn = 0;
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
+	{
+		outputString += "gsave\n" +
+		std::to_string(-get_width()/2 + m_shapes[i]->get_width()/2+total_width_drawn) + " 0" + " translate\n" +
+		m_shapes[i]->to_postscript() +
+		"grestore\n";
+		total_width_drawn += m_shapes[i]->get_width();
+	}
+	return outputString;
 }

@@ -9,6 +9,10 @@
 #include <fstream>
 #include <iostream>
 #include <initializer_list>
+#include <exception>
+
+#ifndef __SHAPES_HPP__
+#define __SHAPES_HPP__
 
 class Shape {
 public:
@@ -145,3 +149,5 @@ public:
 private:
 	std::vector<std::shared_ptr<Shape>> m_shapes;
 };
+
+#endif

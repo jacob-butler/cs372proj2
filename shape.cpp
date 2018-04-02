@@ -19,7 +19,7 @@ void Shape::generate_postscript_file(std::string file_name)
 
 	if (!open_file.is_open()) 
 	{
-    	std::cout << "file failed to open" << file_name + ".ps" << std::endl;
+    	std::cout << "file failed to open " << file_name + ".ps" << std::endl;
   	} 
 	else
 	{
@@ -44,6 +44,10 @@ std::string Circle::to_postscript() const
 Polygon::Polygon(int num_sides, double side_length)
 	:m_num_sides(num_sides), m_side_length(side_length), Shape(0, 0)
 {
+	if(num_sides > 3)
+	{
+		throw std::invalid_argument("a polygon cannot have less than 3 sides");
+	}
 	double width;
 	double height;
 	double cos_part = std::cos(M_PI / ((double)num_sides));

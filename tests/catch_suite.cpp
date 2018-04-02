@@ -23,6 +23,12 @@
 
 #include <memory>
 #include <utility>
+#include <initializer_list>
+
+TEST_CASE("Fail construction", "[construction]")
+{
+	
+}
 
 TEST_CASE("Circle set/get", "[set/get]")
 {
@@ -160,4 +166,85 @@ TEST_CASE("Scaled set/get", "[set/get]")
 	auto scale1 = std::make_unique<Scaled>(std::move(rect1), 0.5, 0.5);
 	REQUIRE(scale1->get_width() == 50.0);
 	REQUIRE(scale1->get_height() == 100.0);
+
+	INFO("Set height");
+	scale1->set_height(200.0);
+	REQUIRE(scale1->get_width() == 50.0);
+	REQUIRE(scale1->get_height() == 200.0);
+
+	INFO("Set width");
+	scale1->set_width(200.0);
+	REQUIRE(scale1->get_width() == 200.0);
+	REQUIRE(scale1->get_height() == 200.0);
+}
+
+TEST_CASE("Layered set/get", "[set/get]")
+{
+	auto rect0 = std::make_unique<Rectangle>(100.0, 200.0);
+	auto rect1 = std::make_unique<Rectangle>(200.0, 100.0);
+	std::initializer_list<std::shared_ptr<Shape>> list0 = { std::move(rect0), std::move(rect1) };
+
+	INFO("Constructor creation with double overlapping rectangles");
+	auto lay0 = std::make_unique<Layered>(list0);
+	REQUIRE(lay0->get_width() == 200.0);
+	REQUIRE(lay0->get_height() == 200.0);
+
+	auto rect2 = std::make_unique<Rectangle>(400.0, 100.0);
+	auto circle0 = std::make_unique<Circle>(150.0);
+	std::initializer_list<std::shared_ptr<Shape>> list1 = { std::move(rect2), std::move(circle0) };
+
+	INFO("Constructor creation with circle overlapping square");
+	auto lay1 = std::make_unique<Layered>(list1);
+	REQUIRE(lay1->get_width() == 400.0);
+	REQUIRE(lay1->get_height() == 300.0);
+
+	INFO("Set height");
+	lay1->set_height(200.0);
+	REQUIRE(lay1->get_width() == 400.0);
+	REQUIRE(lay1->get_height() == 200.0);
+
+	INFO("Set width");
+	lay1->set_width(1200.0);
+	REQUIRE(lay1->get_width() == 1200.0);
+	REQUIRE(lay1->get_height() == 200.0);
+}
+
+TEST_CASE("Vertical set/get", "[set/get]")
+{
+	
+}
+
+TEST_CASE("Horizontal set/get", "[set/get]")
+{
+	
+}
+
+TEST_CASE("Layered Rotated set/get", "[set/get]")
+{
+	
+}
+
+TEST_CASE("Vertical Rotated set/get", "[set/get]")
+{
+
+}
+
+TEST_CASE("Horizontal Rotated set/get", "[set/get]")
+{
+
+}
+
+TEST_CASE("Layered Scaled set/get", "[set/get]")
+{
+
+}
+
+TEST_CASE("Vertical Scaled set/get", "[set/get]")
+{
+
+}
+
+TEST_CASE("Horizontal Scaled set/get", "[set/get]")
+{
+
 }

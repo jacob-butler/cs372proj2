@@ -44,7 +44,7 @@ std::string Circle::to_postscript() const
 Polygon::Polygon(int num_sides, double side_length)
 	:m_num_sides(num_sides), m_side_length(side_length), Shape(0, 0)
 {
-	if(num_sides > 3)
+	if(num_sides < 3)
 	{
 		throw std::invalid_argument("a polygon cannot have less than 3 sides");
 	}

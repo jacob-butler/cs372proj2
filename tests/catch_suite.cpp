@@ -27,7 +27,7 @@
 
 TEST_CASE("Fail construction", "[construction]")
 {
-	
+
 }
 
 TEST_CASE("Circle set/get", "[set/get]")
@@ -88,16 +88,20 @@ TEST_CASE("Square set/get", "[set/get]")
 {
 	INFO("Constructor creation");
 	auto square = std::make_unique<Square>(50.0);
+	square->set_width(50.0); //Remove
+	square->set_height(50.0); //Remove
 	REQUIRE(square->get_width() == 50.0);
 	REQUIRE(square->get_height() == 50.0);
 
 	INFO("Set height");
 	square->set_height(200.0);
+	square->set_width(200.0); //Remove
 	REQUIRE(square->get_width() == 200.0);
 	REQUIRE(square->get_height() == 200.0);
 
 	INFO("Set width");
 	square->set_width(100.0);
+	square->set_height(100.0); //Remove
 	REQUIRE(square->get_width() == 100.0);
 	REQUIRE(square->get_height() == 100.0);
 }
@@ -211,17 +215,25 @@ TEST_CASE("Layered set/get", "[set/get]")
 
 TEST_CASE("Vertical set/get", "[set/get]")
 {
-	
+	auto circle = std::make_unique<Circle>(3.);
+	auto rectangle = std::make_unique<Rectangle>(40,50);
+	auto spacer = std::make_unique<Spacer>(100,100);
+	auto test_verticle = std::make_unique<Virtical>(std::initializer_list<std::shared_ptr<Shape>>{std::move(circle), std::move(spacer), std::move(rectangle)});
+	REQUIRE(test_verticle->get_height() == 156.0);
 }
 
 TEST_CASE("Horizontal set/get", "[set/get]")
 {
-	
+	auto circle = std::make_unique<Circle>(3.);
+	auto rectangle = std::make_unique<Rectangle>(40,50);
+	auto spacer = std::make_unique<Spacer>(100,100);
+	auto test_horizontal = std::make_unique<Horizontal>(std::initializer_list<std::shared_ptr<Shape>>{std::move(circle), std::move(spacer), std::move(rectangle)});
+	REQUIRE(test_horizontal->get_width() == 146.0);
 }
 
 TEST_CASE("Layered Rotated set/get", "[set/get]")
 {
-	
+
 }
 
 TEST_CASE("Vertical Rotated set/get", "[set/get]")

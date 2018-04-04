@@ -60,4 +60,10 @@ int main()
     auto test_circle_radius_100 = std::make_unique<Circle>(100);
     test_circle_radius_100->generate_postscript_file("test_circle_radius_100");
     test_case("circle with radius 100", compare_file_content("cache_circle_radius_100", "test_circle_radius_100"));
+
+
+	auto test_sierpinski = std::make_unique<STriangle>(200.,7);
+	test_sierpinski->generate_postscript_file("test_sierpinski");
+
+	system("Pause");
 }

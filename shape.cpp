@@ -234,3 +234,55 @@ std::string Horizontal::to_postscript() const
 	}
 	return outputString;
 }
+
+STriangle::STriangle(double side_length, int depth):Shape(0,0)
+{
+	double width;
+	double height;
+	double cos_part = std::cos(M_PI / ((double)3));
+	double sin_part = std::sin(M_PI / ((double)3));
+	height = side_length*(1 + cos_part) / (2 * sin_part);
+	width = (side_length * std::sin(M_PI* (3 - 1) / (double)(2 * 3))) / (sin_part);
+	set_width(width);
+	set_height(height);
+
+	if (depth == 0)
+		return;
+
+	if (depth == 1)
+	{
+		auto tri1 = std::make_unique<Triangle>(side_length / 2);
+		auto tri2 = std::make_unique<Triangle>(side_length / 2);
+		auto tri3 = std::make_unique<Triangle>(side_length / 2);
+		m_subTriangles.push_back(std::move(tri1));
+		m_subTriangles.push_back(std::move(tri2));
+		m_subTriangles.push_back(std::move(tri3));
+	}
+	else
+	{
+		auto tri1 = std::make_unique<STriangle>(side_length / 2, depth - 1);
+		auto tri2 = std::make_unique<STriangle>(side_length / 2, depth - 1);
+		auto tri3 = std::make_unique<STriangle>(side_length / 2, depth - 1);
+		m_subTriangles.push_back(std::move(tri1));
+		m_subTriangles.push_back(std::move(tri2));
+		m_subTriangles.push_back(std::move(tri3));
+	}
+}
+
+std::string STriangle::to_postscript() const
+{
+	if (m_subTriangles.size() == 0)
+	{
+		auto tri = std::make_unique<Triangle>(get_width());
+		return tri->to_postscript();
+	}
+
+	return "gsave\n"
+			"-" + std::to_string(get_width() / 4) + " -" + std::to_string(get_height() / 4) + " moveto\n"
+			+ m_subTriangles.at(0)->to_postscript() +
+			std::to_string(get_width() / 4) + " " + std::to_string(get_height() / 2) + " translate\n"
+			+ m_subTriangles.at(1)->to_postscript() +
+			std::to_string(get_width() / 4) + " -" + std::to_string(get_height() / 2) + " translate\n"
+			+ m_subTriangles.at(2)->to_postscript()+
+			"grestore\n";
+}

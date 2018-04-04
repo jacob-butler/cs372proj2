@@ -375,3 +375,14 @@ TEST_CASE("Vertical in Horizontal Shape", "[set/get]")
 	REQUIRE(horiz->get_width() == 140.);
 	REQUIRE((int)(horiz->get_height()) == 140);
 }
+
+
+TEST_CASE("Extra Shapes, Sierpinskis triange", "[set/get]")
+{
+	INFO("Constructor");
+	auto stri = std::make_unique<STriangle>(50., 2);
+	auto tri = std::make_unique<Triangle>(50.);
+	REQUIRE(stri->get_height() == tri->get_height());
+	REQUIRE(stri->get_width() == tri->get_width());
+
+}

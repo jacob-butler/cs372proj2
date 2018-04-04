@@ -151,4 +151,14 @@ private:
 	std::vector<std::shared_ptr<Shape>> m_shapes;
 };
 
+class STriangle : public Shape
+{
+public:
+	STriangle() = default;
+	STriangle(double side, int depth);
+	~STriangle() = default;
+	std::string to_postscript() const;
+private:
+	std::vector < std::shared_ptr<Shape>> m_subTriangles;
+};
 #endif

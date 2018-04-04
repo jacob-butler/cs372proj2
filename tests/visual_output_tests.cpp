@@ -13,6 +13,13 @@ int main()
     auto test_circle_radius_100 = std::make_unique<Circle>(100);
     test_circle_radius_100->generate_postscript_file("cache_circle_radius_100");
 
+    // Testing for Diamond
+    auto diamond_side_length_0 = std::make_unique<Diamond>(0);
+    diamond_side_length_0->generate_postscript_file("cache_diamond_side_length_0");
+    auto diamond_side_length_50 = std::make_unique<Diamond>(50);
+    diamond_side_length_50->generate_postscript_file("cache_diamond_side_length_50");
+    auto diamond_side_length_100 = std::make_unique<Diamond>(100);
+    diamond_side_length_100->generate_postscript_file("cache_diamond_side_length_100");
 
 	// // auto test2 = std::make_unique<Layered>(std::move(test1), 4,4);
     // auto test3 = std::make_unique<Circle>(3.);

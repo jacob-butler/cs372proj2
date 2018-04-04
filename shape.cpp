@@ -2,7 +2,7 @@
 # define M_PI  3.14159265358979323846
 
 
-Shape::Shape(double width, double height) :m_width(width), m_height(height) {}
+Shape::Shape(double width, double height):m_width(width), m_height(height){}
 
 double Shape::get_width() const { return m_width; }
 double Shape::get_height() const { return m_height; }
@@ -17,7 +17,7 @@ void Shape::generate_postscript_file(std::string file_name)
 		to_postscript() + "\nshowpage";
 	std::fstream open_file(file_name + ".ps", std::fstream::trunc | std::fstream::in | std::fstream::out);
 
-	if (!open_file.is_open())
+	if (!open_file.is_open()) 
 	{
 		std::cout << "file failed to open " << file_name + ".ps" << std::endl;
 	}
@@ -29,7 +29,7 @@ void Shape::generate_postscript_file(std::string file_name)
 }
 
 Circle::Circle(double radius)
-	:m_radius(radius), Shape(2 * radius, 2 * radius) {}
+	:m_radius(radius), Shape(2 * radius, 2 * radius){}
 
 std::string Circle::to_postscript() const
 {
@@ -44,7 +44,7 @@ std::string Circle::to_postscript() const
 Polygon::Polygon(int num_sides, double side_length)
 	:m_num_sides(num_sides), m_side_length(side_length), Shape(0, 0)
 {
-	if (num_sides < 3)
+	if(num_sides < 3)
 	{
 		throw std::invalid_argument("a polygon cannot have less than 3 sides");
 	}
@@ -73,8 +73,8 @@ Polygon::Polygon(int num_sides, double side_length)
 
 std::string Polygon::to_postscript() const
 {
-	double y_shift = m_side_length / (2 * std::tan(M_PI / (double)m_num_sides));
-	double x_shift = m_side_length / 2;
+	double y_shift = m_side_length/(2*std::tan(M_PI/(double)m_num_sides));
+	double x_shift = m_side_length/2;
 	return "gsave\n"
 		"0 " + std::to_string(-get_height() / 2 + y_shift) + " translate\n"
 		"0 " + std::to_string(360 / (double)m_num_sides) + " 360 {\n"
@@ -113,7 +113,7 @@ std::string Spacer::to_postscript() const
 }
 
 Rotated::Rotated(std::shared_ptr<Shape> shape, RotationAngle rotation_angle)
-	:Shape(0, 0), m_rot{ rotation_angle }, m_shape{ std::move(shape) }
+	:Shape(0,0), m_rot{rotation_angle}, m_shape{std::move(shape)}
 {
 	if (rotation_angle == HALF)
 	{
@@ -137,7 +137,7 @@ std::string Rotated::to_postscript() const
 }
 
 Scaled::Scaled(std::shared_ptr<Shape> shape, double fx, double fy)
-	:Shape(0, 0), m_shape{ std::move(shape) }, m_fx{ fx }, m_fy{ fy }
+	:Shape(0,0), m_shape{std::move(shape)}, m_fx{fx}, m_fy{fy}
 {
 	{
 		set_width(m_shape->get_width()*fx);
@@ -154,13 +154,13 @@ std::string Scaled::to_postscript() const
 }
 
 Layered::Layered(std::initializer_list<std::shared_ptr<Shape>> shapes)
-	:Shape(0, 0), m_shapes(std::move(shapes))
+	:Shape(0,0), m_shapes(std::move(shapes))
 {
-	for (unsigned int i = 0; i < m_shapes.size(); ++i)
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
 	{
-		if (get_width() < m_shapes[i]->get_width())
+		if(get_width() < m_shapes[i]->get_width())
 			set_width(m_shapes[i]->get_width());
-		if (get_height() < m_shapes[i]->get_height())
+		if(get_height() < m_shapes[i]->get_height())
 			set_height(m_shapes[i]->get_height());
 	}
 }
@@ -170,7 +170,7 @@ std::string Layered::to_postscript() const
 	std::cout << get_width() << std::endl;
 	std::cout << get_height() << std::endl;
 	std::string outputString = "";
-	for (unsigned int i = 0; i < m_shapes.size(); ++i)
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
 	{
 		outputString += "gsave\n" +
 			m_shapes[i]->to_postscript() +
@@ -180,12 +180,12 @@ std::string Layered::to_postscript() const
 }
 
 Virtical::Virtical(std::initializer_list<std::shared_ptr<Shape>> shapes)
-	:Shape(0, 0), m_shapes(std::move(shapes))
+	:Shape(0,0), m_shapes(std::move(shapes))
 {
 	double total_height = 0;
-	for (unsigned int i = 0; i < m_shapes.size(); ++i)
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
 	{
-		if (get_width() < m_shapes[i]->get_width())
+		if(get_width() < m_shapes[i]->get_width())
 			set_width(m_shapes[i]->get_width());
 		total_height += m_shapes[i]->get_height();
 	}
@@ -196,24 +196,24 @@ std::string Virtical::to_postscript() const
 {
 	std::string outputString = "";
 	double total_height_drawn = 0;
-	for (unsigned int i = 0; i < m_shapes.size(); ++i)
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
 	{
-		outputString += "gsave\n"
-			"0 " + std::to_string(-get_height() / 2 + m_shapes[i]->get_height() / 2 + total_height_drawn) + " translate\n" +
-			m_shapes[i]->to_postscript() +
-			"grestore\n";
+		outputString += "gsave\n" 
+		"0 " + std::to_string(-get_height()/2 + m_shapes[i]->get_height()/2+total_height_drawn) + " translate\n" +
+		m_shapes[i]->to_postscript() +
+		"grestore\n";
 		total_height_drawn += m_shapes[i]->get_height();
 	}
 	return outputString;
 }
 
 Horizontal::Horizontal(std::initializer_list<std::shared_ptr<Shape>> shapes)
-	:Shape(0, 0), m_shapes(std::move(shapes))
+	:Shape(0,0), m_shapes(std::move(shapes))
 {
 	double total_width = 0;
-	for (unsigned int i = 0; i < m_shapes.size(); ++i)
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
 	{
-		if (get_height() < m_shapes[i]->get_height())
+		if(get_height() < m_shapes[i]->get_height())
 			set_height(m_shapes[i]->get_height());
 		total_width += m_shapes[i]->get_width();
 	}
@@ -224,12 +224,12 @@ std::string Horizontal::to_postscript() const
 {
 	std::string outputString = "";
 	double total_width_drawn = 0;
-	for (unsigned int i = 0; i < m_shapes.size(); ++i)
+	for(unsigned int i = 0; i < m_shapes.size(); ++i)
 	{
 		outputString += "gsave\n" +
-			std::to_string(-get_width() / 2 + m_shapes[i]->get_width() / 2 + total_width_drawn) + " 0" + " translate\n" +
-			m_shapes[i]->to_postscript() +
-			"grestore\n";
+		std::to_string(-get_width()/2 + m_shapes[i]->get_width()/2+total_width_drawn) + " 0" + " translate\n" +
+		m_shapes[i]->to_postscript() +
+		"grestore\n";
 		total_width_drawn += m_shapes[i]->get_width();
 	}
 	return outputString;
@@ -285,4 +285,27 @@ std::string STriangle::to_postscript() const
 			std::to_string(get_width() / 4) + " -" + std::to_string(get_height() / 2) + " translate\n"
 			+ m_subTriangles.at(2)->to_postscript()+
 			"grestore\n";
+}
+Diamond::Diamond(double side_length)
+	:Shape(0, 0)
+{
+	set_width(side_length);
+	set_height(std::sqrt(3)*side_length);
+}
+
+std::string Diamond::to_postscript() const
+{
+	return "gsave\n"
+		"  newpath\n"
+		"  -" + std::to_string(get_width()/2) + " -" + std::to_string(0) + " moveto\n"
+		"  -" + std::to_string(0) + " -" + std::to_string(get_height()/2) + " lineto\n"
+		"  -" + std::to_string(0) + " -" + std::to_string(get_height()/2) + " moveto\n"
+		"  " + std::to_string(get_width()/2) + " " + std::to_string(0) + " lineto\n"
+		"  " + std::to_string(get_width()/2) + " " + std::to_string(0) + " moveto\n"
+		"  " + std::to_string(0) + " " + std::to_string(get_height()/2) + " lineto\n"
+		"  " + std::to_string(0) + " " + std::to_string(get_height()/2) + " moveto\n"
+		"  -" + std::to_string(get_width()/2) + " -" + std::to_string(0) + " lineto\n"
+		"  closepath\n"
+		"  stroke\n"
+		"grestore\n";
 }

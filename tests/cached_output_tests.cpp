@@ -61,6 +61,19 @@ int main()
     test_circle_radius_100->generate_postscript_file("test_circle_radius_100");
     test_case("circle with radius 100", compare_file_content("cache_circle_radius_100", "test_circle_radius_100"));
 
+    // Testing for Diamond
+    auto diamond_side_length_0 = std::make_unique<Diamond>(0);
+    diamond_side_length_0->generate_postscript_file("test_diamond_side_length_0");
+    test_case("diamond with side length 0", compare_file_content("cache_diamond_side_length_0", "test_diamond_side_length_0"));
+
+    auto diamond_side_length_50 = std::make_unique<Diamond>(50);
+    diamond_side_length_50->generate_postscript_file("test_diamond_side_length_50");
+    test_case("diamond with side length 50", compare_file_content("cache_diamond_side_length_50", "test_diamond_side_length_50"));
+
+    auto diamond_side_length_100 = std::make_unique<Diamond>(100);
+    diamond_side_length_100->generate_postscript_file("test_diamond_side_length_100");
+    test_case("diamond with side length 100", compare_file_content("cache_diamond_side_length_100", "test_diamond_side_length_100"));
+    
 	// Testing for polygons
 	auto test_pentagon_0 = std::make_unique<Polygon>(5, 0.);
 	test_pentagon_0->generate_postscript_file("test_pentagon_0");

@@ -386,3 +386,11 @@ TEST_CASE("Extra Shapes, Sierpinskis triange", "[set/get]")
 	REQUIRE(stri->get_width() == tri->get_width());
 
 }
+
+TEST_CASE("Extra Shapes, Diamond", "[set/get]")
+{
+	INFO("Constructor");
+	auto diamond = std::make_unique<Diamond>(50.);
+	REQUIRE(diamond->get_height() == (50.*sqrt(3.)));
+	REQUIRE(diamond->get_width() == 50.);
+}

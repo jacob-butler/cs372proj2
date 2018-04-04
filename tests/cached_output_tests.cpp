@@ -127,6 +127,8 @@ int main()
 
 	auto test_U_curve = std::make_unique<U_Curve>(100.);
 	test_U_curve->generate_postscript_file("test_U_curve");
+	test_case("U_curve", compare_file_content("cache_test_U_curve", "test_U_curve"));
+
 
 	auto test_LPB = std::make_unique<LPB>(100., 4);
 	test_LPB->generate_postscript_file("test_LPB");

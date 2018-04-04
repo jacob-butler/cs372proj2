@@ -92,19 +92,19 @@ std::string Polygon::to_postscript() const
 
 std::string Rectangle::to_postscript() const
 {
-		return "gsave\n"
-				"  newpath\n"
-				"  -" + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " moveto\n"
-				"  " + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " lineto\n"
-				"  " + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " moveto\n"
-				"  " + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " lineto\n"
-				"  " + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " moveto\n"
-				"  -" + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " lineto\n"
-				"  -" + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " moveto\n"
-				"  -" + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " lineto\n"
-				"  closepath\n"
-				"  stroke\n"
-				"Shape.get_width() + 36grestore\n";
+	return "gsave\n"
+			"  newpath\n"
+			"  -" + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " moveto\n"
+			"  " + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " lineto\n"
+			"  " + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " moveto\n"
+			"  " + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " lineto\n"
+			"  " + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " moveto\n"
+			"  -" + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " lineto\n"
+			"  -" + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " moveto\n"
+			"  -" + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " lineto\n"
+			"  closepath\n"
+			"  stroke\n"
+			"Shape.get_width() + 36grestore\n";
 }
 
 std::string Spacer::to_postscript() const
@@ -233,4 +233,28 @@ std::string Horizontal::to_postscript() const
 		total_width_drawn += m_shapes[i]->get_width();
 	}
 	return outputString;
+}
+
+Diamond::Diamond(double side_length)
+	:Shape(0, 0)
+{
+	set_width(side_length);
+	set_height(std::sqrt(3)*side_length);
+}
+
+std::string Diamond::to_postscript() const
+{
+	return "gsave\n"
+		"  newpath\n"
+		"  -" + std::to_string(get_width()/2) + " -" + std::to_string(0) + " moveto\n"
+		"  -" + std::to_string(0) + " -" + std::to_string(get_height()/2) + " lineto\n"
+		"  -" + std::to_string(0) + " -" + std::to_string(get_height()/2) + " moveto\n"
+		"  " + std::to_string(get_width()/2) + " " + std::to_string(0) + " lineto\n"
+		"  " + std::to_string(get_width()/2) + " " + std::to_string(0) + " moveto\n"
+		"  " + std::to_string(0) + " " + std::to_string(get_height()/2) + " lineto\n"
+		"  " + std::to_string(0) + " " + std::to_string(get_height()/2) + " moveto\n"
+		"  -" + std::to_string(get_width()/2) + " -" + std::to_string(0) + " lineto\n"
+		"  closepath\n"
+		"  stroke\n"
+		"grestore\n";
 }

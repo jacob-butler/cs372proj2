@@ -150,4 +150,14 @@ private:
 	std::vector<std::shared_ptr<Shape>> m_shapes;
 };
 
+class Diamond : public Shape
+{
+public:
+	Diamond() = default;
+	Diamond(double side_length);
+	~Diamond() = default;
+	std::string to_postscript() const;
+private:
+};
+
 #endif

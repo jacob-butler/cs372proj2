@@ -171,4 +171,27 @@ public:
 private:
 	std::vector < std::shared_ptr<Shape>> m_subTriangles;
 };
+
+class U_Curve: public Shape
+{
+public:
+	U_Curve() = default;
+	U_Curve(double side):Shape(side, side){}
+	~U_Curve() = default;
+	std::string to_postscript() const;
+private:
+	std::vector<std::shared_ptr<Shape>> m_subLPB;
+};
+//Line plane bijection
+class LPB : public Shape
+{
+public:
+	LPB() = default;
+	LPB(double side, int depth);
+	~LPB() = default;
+	std::string to_postscript() const;
+private:
+	std::vector<std::shared_ptr<Shape>> m_subLPB;
+	int m_depth;
+};
 #endif

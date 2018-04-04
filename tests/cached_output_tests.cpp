@@ -125,5 +125,11 @@ int main()
 	test_sierpinski->generate_postscript_file("test_sierpinski");
 	test_case("sierpinski triangle with size 200 and recursion depth of 6", compare_file_content("cached_test_sierpinski","test_sierpinski"));
 
+	auto test_U_curve = std::make_unique<U_Curve>(100.);
+	test_U_curve->generate_postscript_file("test_U_curve");
+
+	auto test_LPB = std::make_unique<LPB>(100., 4);
+	test_LPB->generate_postscript_file("test_LPB");
+	test_case("Space filling curve", compare_file_content("cache_test_LPB", "test_LPB"));
 	system("Pause");
 }

@@ -73,4 +73,26 @@ int main()
     auto diamond_side_length_100 = std::make_unique<Diamond>(100);
     diamond_side_length_100->generate_postscript_file("test_diamond_side_length_100");
     test_case("diamond with side length 100", compare_file_content("cache_diamond_side_length_100", "test_diamond_side_length_100"));
+    
+	auto test_pentagon_50 = std::make_unique<Polygon>(5, 50.);
+	test_pentagon_50->generate_postscript_file("test_pentagon_50");
+	test_case("Pentagon with side length 50", compare_file_content("cache_test_pentagon_50", "test_pentagon_50"));
+
+	auto test_pentagon_100 = std::make_unique<Polygon>(5, 100.);
+	test_pentagon_100->generate_postscript_file("test_pentagon_100");
+	test_case("Pentagon with side length 100", compare_file_content("cache_test_pentagon_100", "test_pentagon_100"));
+
+	auto test_square_20 = std::make_unique<Square>(20.);
+	test_square_20->generate_postscript_file("test_square_20");
+	test_case("Square with side length 20", compare_file_content("cache_test_square_20", "test_square_20"));
+
+	auto test_triangle_20 = std::make_unique<Triangle>(20.);
+	test_triangle_20->generate_postscript_file("test_triangle_20");
+	test_case("Triangle with side length 20", compare_file_content("cache_test_triangle_20", "test_triangle_20"));
+
+	auto test_sierpinski = std::make_unique<STriangle>(200.,6);
+	test_sierpinski->generate_postscript_file("test_sierpinski");
+	test_case("sierpinski triangle with size 200 and recursion depth of 6", compare_file_content("cached_test_sierpinski","test_sierpinski"));
+
+	system("Pause");
 }

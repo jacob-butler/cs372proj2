@@ -8,6 +8,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+
 #include <initializer_list>
 #include <exception>
 
@@ -113,7 +114,7 @@ public:
 	std::string to_postscript() const;
 private:
 	std::shared_ptr<Shape> m_shape;
-	double m_fx; 
+	double m_fx;
 	double m_fy;
 };
 
@@ -160,4 +161,14 @@ public:
 private:
 };
 
+class STriangle : public Shape
+{
+public:
+	STriangle() = default;
+	STriangle(double side, int depth);
+	~STriangle() = default;
+	std::string to_postscript() const;
+private:
+	std::vector < std::shared_ptr<Shape>> m_subTriangles;
+};
 #endif

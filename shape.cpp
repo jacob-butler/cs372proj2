@@ -12,15 +12,15 @@ void Shape::set_height(double height) { m_height = height; }
 
 void Shape::generate_postscript_file(std::string file_name)
 {
-	std::string output_postscript = std::to_string(get_width()/2 + 36) + " " +
-									std::to_string(get_height()/2 + 36) + " translate\n\n" +
-									to_postscript() + "\nshowpage";
+	std::string output_postscript = std::to_string(get_width() / 2 + 36) + " " +
+		std::to_string(get_height() / 2 + 36) + " translate\n\n" +
+		to_postscript() + "\nshowpage";
 	std::fstream open_file(file_name + ".ps", std::fstream::trunc | std::fstream::in | std::fstream::out);
 
 	if (!open_file.is_open()) 
 	{
-    	std::cout << "file failed to open " << file_name + ".ps" << std::endl;
-  	} 
+		std::cout << "file failed to open " << file_name + ".ps" << std::endl;
+	}
 	else
 	{
 		open_file << output_postscript;
@@ -32,19 +32,19 @@ Circle::Circle(double radius)
 	:m_radius(radius), Shape(2 * radius, 2 * radius){}
 
 std::string Circle::to_postscript() const
-{ 
-	return "gsave\n" 
-			"newpath \n"
-			"  0 0 " + std::to_string(m_radius) + " 0 360 arc \n"
-			"  stroke \n"
-			"closepath\n"
-			"grestore\n";
+{
+	return "gsave\n"
+		"newpath \n"
+		"  0 0 " + std::to_string(m_radius) + " 0 360 arc \n"
+		"  stroke \n"
+		"closepath\n"
+		"grestore\n";
 }
 
 Polygon::Polygon(int num_sides, double side_length)
 	:m_num_sides(num_sides), m_side_length(side_length), Shape(0, 0)
 {
-	if(num_sides > 3)
+	if(num_sides < 3)
 	{
 		throw std::invalid_argument("a polygon cannot have less than 3 sides");
 	}
@@ -76,18 +76,18 @@ std::string Polygon::to_postscript() const
 	double y_shift = m_side_length/(2*std::tan(M_PI/(double)m_num_sides));
 	double x_shift = m_side_length/2;
 	return "gsave\n"
-			"0 " + std::to_string(-get_height()/2 + y_shift) + " translate\n" 
-			"0 " + std::to_string(360/(double)m_num_sides) + " 360 {\n"
-			"  newpath\n"
-			"  gsave\n"
-			"    rotate\n"
-			"    -" + std::to_string(x_shift) + " -" + std::to_string(y_shift) + " moveto\n"
-			"    " + std::to_string(x_shift) + " -" + std::to_string(y_shift) + " lineto\n"
-			"    stroke\n"
-			"  grestore\n"
-			"  closepath\n"
-			"}for\n"
-			"grestore\n";
+		"0 " + std::to_string(-get_height() / 2 + y_shift) + " translate\n"
+		"0 " + std::to_string(360 / (double)m_num_sides) + " 360 {\n"
+		"  newpath\n"
+		"  gsave\n"
+		"    rotate\n"
+		"    -" + std::to_string(x_shift) + " -" + std::to_string(y_shift) + " moveto\n"
+		"    " + std::to_string(x_shift) + " -" + std::to_string(y_shift) + " lineto\n"
+		"    stroke\n"
+		"  grestore\n"
+		"  closepath\n"
+		"}for\n"
+		"grestore\n";
 }
 
 std::string Rectangle::to_postscript() const
@@ -174,7 +174,7 @@ std::string Layered::to_postscript() const
 	{
 		outputString += "gsave\n" +
 			m_shapes[i]->to_postscript() +
-		"grestore\n";
+			"grestore\n";
 	}
 	return outputString;
 }
@@ -235,6 +235,57 @@ std::string Horizontal::to_postscript() const
 	return outputString;
 }
 
+STriangle::STriangle(double side_length, int depth):Shape(0,0)
+{
+	double width;
+	double height;
+	double cos_part = std::cos(M_PI / ((double)3));
+	double sin_part = std::sin(M_PI / ((double)3));
+	height = side_length*(1 + cos_part) / (2 * sin_part);
+	width = (side_length * std::sin(M_PI* (3 - 1) / (double)(2 * 3))) / (sin_part);
+	set_width(width);
+	set_height(height);
+
+	if (depth == 0)
+		return;
+
+	if (depth == 1)
+	{
+		auto tri1 = std::make_unique<Triangle>(side_length / 2);
+		auto tri2 = std::make_unique<Triangle>(side_length / 2);
+		auto tri3 = std::make_unique<Triangle>(side_length / 2);
+		m_subTriangles.push_back(std::move(tri1));
+		m_subTriangles.push_back(std::move(tri2));
+		m_subTriangles.push_back(std::move(tri3));
+	}
+	else
+	{
+		auto tri1 = std::make_unique<STriangle>(side_length / 2, depth - 1);
+		auto tri2 = std::make_unique<STriangle>(side_length / 2, depth - 1);
+		auto tri3 = std::make_unique<STriangle>(side_length / 2, depth - 1);
+		m_subTriangles.push_back(std::move(tri1));
+		m_subTriangles.push_back(std::move(tri2));
+		m_subTriangles.push_back(std::move(tri3));
+	}
+}
+
+std::string STriangle::to_postscript() const
+{
+	if (m_subTriangles.size() == 0)
+	{
+		auto tri = std::make_unique<Triangle>(get_width());
+		return tri->to_postscript();
+	}
+
+	return "gsave\n"
+			"-" + std::to_string(get_width() / 4) + " -" + std::to_string(get_height() / 4) + " translate\n"
+			+ m_subTriangles.at(0)->to_postscript() +
+			std::to_string(get_width() / 4) + " " + std::to_string(get_height() / 2) + " translate\n"
+			+ m_subTriangles.at(1)->to_postscript() +
+			std::to_string(get_width() / 4) + " -" + std::to_string(get_height() / 2) + " translate\n"
+			+ m_subTriangles.at(2)->to_postscript()+
+			"grestore\n";
+}
 Diamond::Diamond(double side_length)
 	:Shape(0, 0)
 {

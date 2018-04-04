@@ -6,6 +6,10 @@ CPS consists of:
 - A shape language.
 - A shape to PostScript translator.
 
+# Notes
+
+- Using `catch` requires separate `main` function (not sure if can combine). Comment out `catch_main.cpp` and `catch_suite.cpp` if running PostScript tests (as opposed to `catch` tests).
+
 # Tasks
 
 - [ ] Circle.

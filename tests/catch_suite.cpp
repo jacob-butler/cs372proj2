@@ -233,30 +233,57 @@ TEST_CASE("Horizontal set/get", "[set/get]")
 
 TEST_CASE("Layered Rotated set/get", "[set/get]")
 {
+	auto rect0 = std::make_unique<Rectangle>(100.0, 200.0);
+	auto rect1 = std::make_unique<Rectangle>(200.0, 100.0);
+	std::initializer_list<std::shared_ptr<Shape>> list0 = { std::move(rect0), std::move(rect1) };
+	auto lay0 = std::make_unique<Layered>(list0);
 
+	auto spacer = std::make_unique<Spacer>(100,100);
+
+	auto square0 = std::make_unique<Square>(100.0);
+	auto square1 = std::make_unique<Square>(200.0);
+	std::initializer_list<std::shared_ptr<Shape>> list1 = { std::move(square0), std::move(square1) };
+	auto lay1 = std::make_unique<Layered>(list0);
+
+	auto test_layered_rot = std::make_unique<Layered>(std::initializer_list<std::shared_ptr<Shape>>{std::move(lay0), std::move(spacer), std::move(lay1)});
+	REQUIRE(test_layered_rot->get_width() == 100.0);
+	REQUIRE(test_layered_rot->get_height() == 200.0);
 }
 
 TEST_CASE("Vertical Rotated set/get", "[set/get]")
 {
+	auto square = std::make_unique<Square>(50.0);
+	auto rectangle = std::make_unique<Rectangle>(40,50);
+	auto spacer = std::make_unique<Spacer>(100,100);
 
+	auto rotated_rectangle = std::make_unique<Rotated>(std::move(rectangle), Rotated::QUARTER);
+	auto rotated_square = std::make_unique<Rotated>(std::move(square), Rotated::QUARTER);
+
+	auto test_verticle_rotated = std::make_unique<Virtical>(std::initializer_list<std::shared_ptr<Shape>>{std::move(rotated_square), std::move(spacer), std::move(rotated_rectangle)});
+	REQUIRE(test_verticle_rotated->get_height() == 190.0);
 }
 
 TEST_CASE("Horizontal Rotated set/get", "[set/get]")
 {
+	auto square = std::make_unique<Square>(50.0);
+	auto rectangle = std::make_unique<Rectangle>(40,50);
+	auto spacer = std::make_unique<Spacer>(100,100);
 
+	auto rotated_rectangle = std::make_unique<Rotated>(std::move(rectangle), Rotated::QUARTER);
+	auto rotated_square = std::make_unique<Rotated>(std::move(square), Rotated::QUARTER);
+
+	auto test_verticle_rotated = std::make_unique<Horizontal>(std::initializer_list<std::shared_ptr<Shape>>{std::move(rotated_square), std::move(spacer), std::move(rotated_rectangle)});
+	REQUIRE(test_verticle_rotated->get_width() == 200.0);
 }
 
 TEST_CASE("Layered Scaled set/get", "[set/get]")
 {
-
 }
 
 TEST_CASE("Vertical Scaled set/get", "[set/get]")
 {
-
 }
 
 TEST_CASE("Horizontal Scaled set/get", "[set/get]")
 {
-
 }

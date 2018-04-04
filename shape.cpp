@@ -278,7 +278,7 @@ std::string STriangle::to_postscript() const
 	}
 
 	return "gsave\n"
-			"-" + std::to_string(get_width() / 4) + " -" + std::to_string(get_height() / 4) + " moveto\n"
+			"-" + std::to_string(get_width() / 4) + " -" + std::to_string(get_height() / 4) + " translate\n"
 			+ m_subTriangles.at(0)->to_postscript() +
 			std::to_string(get_width() / 4) + " " + std::to_string(get_height() / 2) + " translate\n"
 			+ m_subTriangles.at(1)->to_postscript() +

@@ -117,11 +117,68 @@ Rotated::Rotated(std::unique_ptr<Shape> shape, RotationAngle rotation_angle):Sha
 	}
 }
 
+Rotated::Rotated(const Rotated& shape):Shape(0,0),m_rot(shape.m_rot),m_shape(shape.m_shape->clone()){}
+
 std::string Rotated::to_postscript() const
 {
 	return "gsave\n"
-		+ std::to_string(m_rot) + " rotate\n"
-		+ m_shape->to_postscript()
-		+ "-" + std::to_string(m_rot) + " rotate\n"
-		"grestore\n";
+			+ std::to_string(m_rot) + " rotate\n"
+			+ m_shape->to_postscript()
+			+ "-" + std::to_string(m_rot) + " rotate\n"
+			"grestore\n";
+}
+
+Scaled::Scaled(std::unique_ptr<Shape>shape, double fx, double fy) :
+	Shape(0, 0), m_fx(fx), m_fy(fy), m_shape(shape->clone())
+{
+	set_width(m_fx*m_shape->get_width());
+	set_height(m_fy*m_shape->get_height());
+}
+
+Scaled::Scaled(const Scaled & shape):Shape(shape.get_width(),shape.get_height()), m_shape(shape.clone())
+{
+	m_fx = shape.m_fx;
+	m_fy = shape.m_fy;
+}
+
+std::string Scaled::to_postscript() const
+{
+	return "gsave\n"
+			+ std::to_string(m_fx) + " " + std::to_string(m_fy) + " scale\n"
+			+ m_shape->to_postscript()
+			+"grestore\n";
+			
+}
+
+Layered::Layered(std::vector<std::unique_ptr<Shape>> shapes):Shape(0,0)
+{
+	double width = 0;
+	double height = 0;
+	for (int i = 0;i < shapes.size();i++)
+	{
+		width = std::max(width, shapes.at(i)->get_width());
+		height = std::max(height, shapes.at(i)->get_width());
+		m_shapes.push_back(std::move(shapes.at(i)));
+	}
+	set_height(height);
+	set_width(width);
+}
+
+Layered::Layered(const Layered & shape) :
+	Shape(shape.get_width(), shape.get_height())
+{
+	for (int i = 0;i < shape.m_shapes.size();i++)
+	{
+		m_shapes.push_back((shape.m_shapes.at(i)->clone()));
+	}
+}
+
+std::string Layered::to_postscript() const
+{
+	std::string postscript = "";
+	//for (int i = 0;i < m_shapes.size();i++)
+	//{
+	//	postscript.append(m_shapes.at(i)->to_postscript());
+	//}
+	return postscript;
 }

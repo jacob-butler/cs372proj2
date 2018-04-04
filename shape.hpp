@@ -7,6 +7,8 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 class Shape {
 public:
@@ -68,9 +70,37 @@ public:
 	Rotated() = default;
 	Rotated(std::unique_ptr<Shape> shape, RotationAngle rotation_angle);
 	~Rotated() = default;
+	Rotated(const Rotated&);
 	virtual Rotated* clone() const { return new Rotated(*this); }
 	std::string to_postscript() const;
 private:
 	RotationAngle m_rot;
 	Shape* m_shape;
+};
+
+class Scaled : public Shape
+{
+public:
+	Scaled() = default;
+	Scaled(std::unique_ptr<Shape> shape, double fx, double fy);
+	~Scaled() = default;
+	Scaled(const Scaled&);
+	virtual Scaled* clone() const { return new Scaled(*this); }
+	std::string to_postscript() const;
+private:
+	std::unique_ptr<Shape> m_shape;
+	double m_fx, m_fy;
+};
+
+class Layered : public Shape
+{
+public:
+	Layered() = default;
+	Layered(std::vector<std::unique_ptr<Shape>> shapes);
+	~Layered() = default;
+	Layered(const Layered&);
+	virtual Layered* clone() const { return new Layered(*this); }
+	std::string to_postscript() const;
+private:
+	std::vector<std::unique_ptr<Shape>> m_shapes;
 };

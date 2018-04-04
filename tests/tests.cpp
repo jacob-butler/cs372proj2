@@ -9,6 +9,7 @@ int main()
 	auto test2 = std::make_unique<Rotated>(std::make_unique<Polygon>(*test1->clone()), Rotated::QUARTER);
     auto test3 = std::make_unique<Circle>(3.);
     auto test4 = std::make_unique<Polygon>(7,50);
+	auto test5 = std::make_unique<Scaled>(std::make_unique<Polygon>(*test1->clone()), 5, 10);
     // std::cout << test1.to_postscript() << std::endl;
-    test2->generate_postscript_file("tests");
+    test5->generate_postscript_file("tests");
 }

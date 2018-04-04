@@ -1,19 +1,4 @@
-
-//Tests for checkers program
-//Uses catch framework.
-//
-//In order to add/ modify tests,
-//simply write
-//		TEST_CASE(" description ", "[ Test Category ]")
-//		{
-//			//code to be tested
-//		}
-//
-//Inside of test case, use
-//			INFO("description");
-//to give user description of current subtest. Use
-//			REQUIRE( some boolean );
-//fo actual condition being tested.
+//Tests for Shape Class
 
 #define CATCH_CONFIG_FAST_COMPILE
 # define M_PI  3.14159265358979323846
@@ -129,6 +114,28 @@ TEST_CASE("Triangle set/get", "[set/get]")
 	tri->set_width(100.0);
 	REQUIRE(tri->get_width() == 100.0);
 	REQUIRE(tri->get_height() == 200.0);
+}
+
+TEST_CASE("Polygon set/test", "[set/get]")
+{
+	const auto side_length = 1.0;
+	const auto num_sides = 5;
+	const auto cos_part = std::cos(M_PI / double(5));
+	const auto sin_part = std::sin(M_PI / double(5));
+	const auto height = side_length*(1 + cos_part) / (2 * sin_part);
+	const auto width = (side_length * std::sin(M_PI* (num_sides - 1) / double(2 * num_sides))) / (sin_part);
+	auto pentagon = std::make_unique<Polygon>(5, 1.);
+	INFO("Constructor");
+	REQUIRE(pentagon->get_height() == height);
+	REQUIRE(pentagon->get_width() == width);
+
+
+	INFO("set height");
+	pentagon->set_height(2.);
+	REQUIRE(pentagon->get_height() == 2.);
+	INFO("set width");
+	pentagon->set_width(20.);
+	REQUIRE(pentagon->get_width() == 20.);
 }
 
 TEST_CASE("Rotated set/get", "[set/get]")
@@ -317,4 +324,54 @@ TEST_CASE("Horizontal Scaled set/get", "[set/get]")
 	auto horiz_scaled = std::make_unique<Horizontal>(std::initializer_list < std::shared_ptr<Shape>>{std::move(ssquare), std::move(sspacer), std::move(srect)});
 	REQUIRE(horiz_scaled->get_width() == 190.);
 	REQUIRE(horiz_scaled->get_height() == 160.);
+}
+
+TEST_CASE("Horizontal in Vertical Shape", "[set/get]")
+{
+	auto s1 = std::make_unique<Square>(50.);
+	auto s2 = std::make_unique<Square>(40.);
+	auto s3 = std::make_unique<Square>(20.);
+	auto s4 = std::make_unique<Square>(10.);
+	auto horiz1 = std::make_unique<Horizontal>(std::initializer_list<std::shared_ptr<Shape>>{std::move(s1), std::move(s2), std::move(s3), std::move(s4)});
+
+	auto rect = std::make_unique<Rectangle>(40., 20.);
+	auto rect2= std::make_unique<Rectangle>(40., 20.);
+	
+	auto horiz2 = std::make_unique<Horizontal>(std::initializer_list<std::shared_ptr<Shape>>{std::move(horiz1), std::move(rect)});
+
+	auto s5 = std::make_unique<Square>(50.);
+	auto s6 = std::make_unique<Square>(40.);
+	auto s7 = std::make_unique<Square>(20.);
+	auto s8 = std::make_unique<Square>(10.);
+	auto horiz3 = std::make_unique<Horizontal>(std::initializer_list<std::shared_ptr<Shape>>{std::move(s5), std::move(s6), std::move(s7), std::move(s8)});
+
+	auto vertical = std::make_unique<Virtical>(std::initializer_list<std::shared_ptr<Shape>>{std::move(horiz2), std::move(horiz3), std::move(rect2)});
+
+	REQUIRE(vertical->get_width() == 160.);
+	REQUIRE((int)(vertical->get_height()) == 120);
+}
+
+TEST_CASE("Vertical in Horizontal Shape", "[set/get]")
+{
+	auto s1 = std::make_unique<Square>(50.);
+	auto s2 = std::make_unique<Square>(40.);
+	auto s3 = std::make_unique<Square>(20.);
+	auto s4 = std::make_unique<Square>(10.);
+	auto vert1 = std::make_unique<Virtical>(std::initializer_list<std::shared_ptr<Shape>>{std::move(s1), std::move(s2), std::move(s3), std::move(s4)});
+
+	auto rect = std::make_unique<Rectangle>(40., 20.);
+	auto rect2 = std::make_unique<Rectangle>(40., 20.);
+
+	auto vert2 = std::make_unique<Virtical>(std::initializer_list<std::shared_ptr<Shape>>{std::move(vert1), std::move(rect)});
+
+	auto s5 = std::make_unique<Square>(50.);
+	auto s6 = std::make_unique<Square>(40.);
+	auto s7 = std::make_unique<Square>(20.);
+	auto s8 = std::make_unique<Square>(10.);
+	auto vert3 = std::make_unique<Virtical>(std::initializer_list<std::shared_ptr<Shape>>{std::move(s5), std::move(s6), std::move(s7), std::move(s8)});
+
+	auto horiz = std::make_unique<Horizontal>(std::initializer_list<std::shared_ptr<Shape>>{std::move(vert2), std::move(vert3), std::move(rect2)});
+
+	REQUIRE(horiz->get_width() == 140.);
+	REQUIRE((int)(horiz->get_height()) == 140);
 }

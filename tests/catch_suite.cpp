@@ -1,4 +1,19 @@
-//Tests for Shape Class
+
+//Tests for checkers program
+//Uses catch framework.
+//
+//In order to add/ modify tests,
+//simply write
+//		TEST_CASE(" description ", "[ Test Category ]")
+//		{
+//			//code to be tested
+//		}
+//
+//Inside of test case, use
+//			INFO("description");
+//to give user description of current subtest. Use
+//			REQUIRE( some boolean );
+//fo actual condition being tested.
 
 #define CATCH_CONFIG_FAST_COMPILE
 # define M_PI  3.14159265358979323846
@@ -116,28 +131,6 @@ TEST_CASE("Triangle set/get", "[set/get]")
 	REQUIRE(tri->get_height() == 200.0);
 }
 
-TEST_CASE("Polygon set/test", "[set/get]")
-{
-	const auto side_length = 1.0;
-	const auto num_sides = 5;
-	const auto cos_part = std::cos(M_PI / double(5));
-	const auto sin_part = std::sin(M_PI / double(5));
-	const auto height = side_length*(1 + cos_part) / (2 * sin_part);
-	const auto width = (side_length * std::sin(M_PI* (num_sides - 1) / double(2 * num_sides))) / (sin_part);
-	auto pentagon = std::make_unique<Polygon>(5, 1.);
-	INFO("Constructor");
-	REQUIRE(pentagon->get_height() == height);
-	REQUIRE(pentagon->get_width() == width);
-
-
-	INFO("set height");
-	pentagon->set_height(2.);
-	REQUIRE(pentagon->get_height() == 2.);
-	INFO("set width");
-	pentagon->set_width(20.);
-	REQUIRE(pentagon->get_width() == 20.);
-}
-
 TEST_CASE("Rotated set/get", "[set/get]")
 {
 	auto rect = std::make_unique<Rectangle>(100.0, 200.0);
@@ -240,16 +233,21 @@ TEST_CASE("Horizontal set/get", "[set/get]")
 
 TEST_CASE("Layered Rotated set/get", "[set/get]")
 {
-	auto square = std::make_unique<Square>(30.0);
-	auto rectangle = std::make_unique<Rectangle>(40, 50);
-	auto spacer = std::make_unique<Spacer>(20, 60);
+	auto rect0 = std::make_unique<Rectangle>(100.0, 200.0);
+	auto rect1 = std::make_unique<Rectangle>(200.0, 100.0);
+	std::initializer_list<std::shared_ptr<Shape>> list0 = { std::move(rect0), std::move(rect1) };
+	auto lay0 = std::make_unique<Layered>(list0);
 
-	auto rotated_rectangle = std::make_unique<Rotated>(std::move(rectangle), Rotated::QUARTER);
-	auto rotated_square = std::make_unique<Rotated>(std::move(square), Rotated::QUARTER);
+	auto spacer = std::make_unique<Spacer>(100,100);
 
-	auto test_layered_rotated = std::make_unique<Layered>(std::initializer_list<std::shared_ptr<Shape>>{std::move(rotated_square), std::move(spacer), std::move(rotated_rectangle)});
-	REQUIRE(test_layered_rotated->get_height() == 60.0);
-	REQUIRE(test_layered_rotated->get_width() == 50.0);
+	auto square0 = std::make_unique<Square>(100.0);
+	auto square1 = std::make_unique<Square>(200.0);
+	std::initializer_list<std::shared_ptr<Shape>> list1 = { std::move(square0), std::move(square1) };
+	auto lay1 = std::make_unique<Layered>(list0);
+
+	auto test_layered_rot = std::make_unique<Layered>(std::initializer_list<std::shared_ptr<Shape>>{std::move(lay0), std::move(spacer), std::move(lay1)});
+	REQUIRE(test_layered_rot->get_width() == 200.0);
+	REQUIRE(test_layered_rot->get_height() == 200.0);
 }
 
 TEST_CASE("Vertical Rotated set/get", "[set/get]")
@@ -269,6 +267,7 @@ TEST_CASE("Horizontal Rotated set/get", "[set/get]")
 {
 	auto square = std::make_unique<Square>(50.0);
 	auto rectangle = std::make_unique<Rectangle>(40,50);
+
 	auto spacer = std::make_unique<Spacer>(100,100);
 
 	auto rotated_rectangle = std::make_unique<Rotated>(std::move(rectangle), Rotated::QUARTER);
@@ -280,117 +279,39 @@ TEST_CASE("Horizontal Rotated set/get", "[set/get]")
 
 TEST_CASE("Layered Scaled set/get", "[set/get]")
 {
-	auto square = std::make_unique<Square>(10.);
-	auto rect = std::make_unique<Rectangle>(20., 40.);
-	auto spacer = std::make_unique<Spacer>(30., 40.);
+	auto rect0 = std::make_unique<Rectangle>(100.0, 200.0);
+	auto rect1 = std::make_unique<Rectangle>(200.0, 100.0);
 
-	auto ssquare = std::make_unique<Scaled>(std::move(square), 2., 2.);
-	auto srect = std::make_unique<Scaled>(std::move(rect), 4., 4.);
-	auto sspacer = std::make_unique<Scaled>(std::move(spacer), 3., 3.);
+	auto scale_rect_0 = std::make_unique<Scaled>(std::move(rect0), 10, 10);
+	auto scale_rect_1 = std::make_unique<Scaled>(std::move(rect1), 10, 10);
 
+	std::initializer_list<std::shared_ptr<Shape>> list0 = { std::move(scale_rect_0), std::move(scale_rect_1) };
+	auto lay0 = std::make_unique<Layered>(list0);
 
-	auto layered_scaled = std::make_unique<Layered>(std::initializer_list < std::shared_ptr<Shape>>{std::move(ssquare), std::move(sspacer), std::move(srect)});
-	REQUIRE(layered_scaled->get_width() == 90.);
-	REQUIRE(layered_scaled->get_height() == 160.);
+	REQUIRE(lay0->get_width() == 2000.0);
+	REQUIRE(lay0->get_height() == 2000.0);
 }
 
 TEST_CASE("Vertical Scaled set/get", "[set/get]")
 {
-	auto square = std::make_unique<Square>(10.);
-	auto rect = std::make_unique<Rectangle>(20., 40.);
-	auto spacer = std::make_unique<Spacer>(30., 40.);
+	auto rect0 = std::make_unique<Rectangle>(100.0, 200.0);
+	auto scale_rect_0 = std::make_unique<Scaled>(std::move(rect0), 10, 10);
+	auto rect1 = std::make_unique<Rectangle>(200.0, 100.0);
+	auto scale_rect_1 = std::make_unique<Scaled>(std::move(rect1), 10, 10);
 
-	auto ssquare = std::make_unique<Scaled>(std::move(square), 2., 2.);
-	auto srect = std::make_unique<Scaled>(std::move(rect), 4., 4.);
-	auto sspacer = std::make_unique<Scaled>(std::move(spacer), 3., 3.);
+	auto test_verticle_scaled = std::make_unique<Virtical>(std::initializer_list<std::shared_ptr<Shape>>{std::move(scale_rect_0), std::move(scale_rect_1)});
 
-
-	auto vertical_scaled = std::make_unique<Virtical>(std::initializer_list < std::shared_ptr<Shape>>{std::move(ssquare), std::move(sspacer), std::move(srect)});
-	REQUIRE(vertical_scaled->get_width() == 90.);
-	REQUIRE(vertical_scaled->get_height() == 300.);
+	REQUIRE(test_verticle_scaled->get_height() == 3000.0);
 }
 
 TEST_CASE("Horizontal Scaled set/get", "[set/get]")
 {
-	auto square = std::make_unique<Square>(10.);
-	auto rect = std::make_unique<Rectangle>(20., 40.);
-	auto spacer = std::make_unique<Spacer>(30., 40.);
+	auto rect0 = std::make_unique<Rectangle>(100.0, 200.0);
+	auto scale_rect_0 = std::make_unique<Scaled>(std::move(rect0), 10, 10);
+	auto rect1 = std::make_unique<Rectangle>(200.0, 100.0);
+	auto scale_rect_1 = std::make_unique<Scaled>(std::move(rect1), 10, 10);
 
-	auto ssquare = std::make_unique<Scaled>(std::move(square), 2., 2.);
-	auto srect = std::make_unique<Scaled>(std::move(rect), 4., 4.);
-	auto sspacer = std::make_unique<Scaled>(std::move(spacer), 3., 3.);
+	auto test_verticle_scaled = std::make_unique<Horizontal>(std::initializer_list<std::shared_ptr<Shape>>{std::move(scale_rect_0), std::move(scale_rect_1)});
 
-
-	auto horiz_scaled = std::make_unique<Horizontal>(std::initializer_list < std::shared_ptr<Shape>>{std::move(ssquare), std::move(sspacer), std::move(srect)});
-	REQUIRE(horiz_scaled->get_width() == 190.);
-	REQUIRE(horiz_scaled->get_height() == 160.);
-}
-
-TEST_CASE("Horizontal in Vertical Shape", "[set/get]")
-{
-	auto s1 = std::make_unique<Square>(50.);
-	auto s2 = std::make_unique<Square>(40.);
-	auto s3 = std::make_unique<Square>(20.);
-	auto s4 = std::make_unique<Square>(10.);
-	auto horiz1 = std::make_unique<Horizontal>(std::initializer_list<std::shared_ptr<Shape>>{std::move(s1), std::move(s2), std::move(s3), std::move(s4)});
-
-	auto rect = std::make_unique<Rectangle>(40., 20.);
-	auto rect2= std::make_unique<Rectangle>(40., 20.);
-	
-	auto horiz2 = std::make_unique<Horizontal>(std::initializer_list<std::shared_ptr<Shape>>{std::move(horiz1), std::move(rect)});
-
-	auto s5 = std::make_unique<Square>(50.);
-	auto s6 = std::make_unique<Square>(40.);
-	auto s7 = std::make_unique<Square>(20.);
-	auto s8 = std::make_unique<Square>(10.);
-	auto horiz3 = std::make_unique<Horizontal>(std::initializer_list<std::shared_ptr<Shape>>{std::move(s5), std::move(s6), std::move(s7), std::move(s8)});
-
-	auto vertical = std::make_unique<Virtical>(std::initializer_list<std::shared_ptr<Shape>>{std::move(horiz2), std::move(horiz3), std::move(rect2)});
-
-	REQUIRE(vertical->get_width() == 160.);
-	REQUIRE((int)(vertical->get_height()) == 120);
-}
-
-TEST_CASE("Vertical in Horizontal Shape", "[set/get]")
-{
-	auto s1 = std::make_unique<Square>(50.);
-	auto s2 = std::make_unique<Square>(40.);
-	auto s3 = std::make_unique<Square>(20.);
-	auto s4 = std::make_unique<Square>(10.);
-	auto vert1 = std::make_unique<Virtical>(std::initializer_list<std::shared_ptr<Shape>>{std::move(s1), std::move(s2), std::move(s3), std::move(s4)});
-
-	auto rect = std::make_unique<Rectangle>(40., 20.);
-	auto rect2 = std::make_unique<Rectangle>(40., 20.);
-
-	auto vert2 = std::make_unique<Virtical>(std::initializer_list<std::shared_ptr<Shape>>{std::move(vert1), std::move(rect)});
-
-	auto s5 = std::make_unique<Square>(50.);
-	auto s6 = std::make_unique<Square>(40.);
-	auto s7 = std::make_unique<Square>(20.);
-	auto s8 = std::make_unique<Square>(10.);
-	auto vert3 = std::make_unique<Virtical>(std::initializer_list<std::shared_ptr<Shape>>{std::move(s5), std::move(s6), std::move(s7), std::move(s8)});
-
-	auto horiz = std::make_unique<Horizontal>(std::initializer_list<std::shared_ptr<Shape>>{std::move(vert2), std::move(vert3), std::move(rect2)});
-
-	REQUIRE(horiz->get_width() == 140.);
-	REQUIRE((int)(horiz->get_height()) == 140);
-}
-
-
-TEST_CASE("Extra Shapes, Sierpinskis triange", "[set/get]")
-{
-	INFO("Constructor");
-	auto stri = std::make_unique<STriangle>(50., 2);
-	auto tri = std::make_unique<Triangle>(50.);
-	REQUIRE(stri->get_height() == tri->get_height());
-	REQUIRE(stri->get_width() == tri->get_width());
-
-}
-
-TEST_CASE("Extra Shapes, Diamond", "[set/get]")
-{
-	INFO("Constructor");
-	auto diamond = std::make_unique<Diamond>(50.);
-	REQUIRE(diamond->get_height() == (50.*sqrt(3.)));
-	REQUIRE(diamond->get_width() == 50.);
+	REQUIRE(test_verticle_scaled->get_height() == 2000.0);
 }

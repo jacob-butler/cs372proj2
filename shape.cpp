@@ -104,7 +104,7 @@ std::string Rectangle::to_postscript() const
 		"  -" + std::to_string(get_width() / 2) + " -" + std::to_string(get_height() / 2) + " lineto\n"
 		"  closepath\n"
 		"  stroke\n"
-		"Shape.get_width() + 36grestore\n";
+		"grestore\n";
 }
 
 std::string Spacer::to_postscript() const

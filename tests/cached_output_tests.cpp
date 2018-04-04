@@ -74,6 +74,11 @@ int main()
     diamond_side_length_100->generate_postscript_file("test_diamond_side_length_100");
     test_case("diamond with side length 100", compare_file_content("cache_diamond_side_length_100", "test_diamond_side_length_100"));
     
+	// Testing for polygons
+	auto test_pentagon_0 = std::make_unique<Polygon>(5, 0.);
+	test_pentagon_0->generate_postscript_file("test_pentagon_0");
+	test_case("Pentagon with side length 0", compare_file_content("cache_test_pentagon_0", "test_pentagon_0"));
+
 	auto test_pentagon_50 = std::make_unique<Polygon>(5, 50.);
 	test_pentagon_50->generate_postscript_file("test_pentagon_50");
 	test_case("Pentagon with side length 50", compare_file_content("cache_test_pentagon_50", "test_pentagon_50"));
@@ -89,6 +94,32 @@ int main()
 	auto test_triangle_20 = std::make_unique<Triangle>(20.);
 	test_triangle_20->generate_postscript_file("test_triangle_20");
 	test_case("Triangle with side length 20", compare_file_content("cache_test_triangle_20", "test_triangle_20"));
+
+	auto test_hexagon_0 = std::make_unique<Polygon>(5, 0.);
+	test_hexagon_0->generate_postscript_file("test_hexagon_0");
+	test_case("Hexagon with side length 0", compare_file_content("cache_test_hexagon_0", "test_hexagon_0"));
+
+	auto test_hexagon_50 = std::make_unique<Polygon>(5, 50.);
+	test_hexagon_50->generate_postscript_file("test_hexagon_50");
+	test_case("Hexagon with side length 50", compare_file_content("cache_test_hexagon_50", "test_hexagon_50"));
+
+	auto test_hexagon_100 = std::make_unique<Polygon>(5, 100.);
+	test_hexagon_100->generate_postscript_file("test_hexagon_100");
+	test_case("Hexagon with side length 100", compare_file_content("cache_test_hexagon_100", "test_hexagon_100"));
+
+	// Testing for rotation
+	auto rect = std::make_unique<Rectangle>(50., 20.);
+	auto test_rot_q = std::make_unique<Rotated>(std::move(rect), Rotated::QUARTER);
+	test_rot_q->generate_postscript_file("test_rot_q");
+	test_case("Rotated Shape", compare_file_content("cache_test_rot_q", "test_rot_q"));
+
+	// Testing for Horizontal
+	auto square1 = std::make_unique<Square>(50.);
+	auto square2 = std::make_unique<Square>(50.);
+	auto square3 = std::make_unique<Square>(50.);
+	auto test_horiz = std::make_unique<Horizontal>(std::initializer_list < std::shared_ptr<Shape>>{std::move(square1), std::move(square2), std::move(square3)});
+	test_horiz->generate_postscript_file("test_horiz");
+	test_case("Horizontal Shape", compare_file_content("cache_test_horiz", "test_horiz"));
 
 	auto test_sierpinski = std::make_unique<STriangle>(200.,6);
 	test_sierpinski->generate_postscript_file("test_sierpinski");

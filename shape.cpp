@@ -2,7 +2,7 @@
 # define M_PI  3.14159265358979323846
 
 
-Shape::Shape(double width, double height):m_width(width), m_height(height){}
+Shape::Shape(double width, double height) :m_width(width), m_height(height) {}
 
 double Shape::get_width() const { return m_width; }
 double Shape::get_height() const { return m_height; }
@@ -12,15 +12,15 @@ void Shape::set_height(double height) { m_height = height; }
 
 void Shape::generate_postscript_file(std::string file_name)
 {
-	std::string output_postscript = std::to_string(get_width()/2 + 36) + " " +
-									std::to_string(get_height()/2 + 36) + " translate\n\n" +
-									to_postscript() + "\nshowpage";
+	std::string output_postscript = std::to_string(get_width() / 2 + 36) + " " +
+		std::to_string(get_height() / 2 + 36) + " translate\n\n" +
+		to_postscript() + "\nshowpage";
 	std::fstream open_file(file_name + ".ps", std::fstream::trunc | std::fstream::in | std::fstream::out);
 
-	if (!open_file.is_open()) 
+	if (!open_file.is_open())
 	{
-    	std::cout << "file failed to open" << file_name + ".ps" << std::endl;
-  	} 
+		std::cout << "file failed to open " << file_name + ".ps" << std::endl;
+	}
 	else
 	{
 		open_file << output_postscript;
@@ -29,21 +29,25 @@ void Shape::generate_postscript_file(std::string file_name)
 }
 
 Circle::Circle(double radius)
-	:m_radius(radius), Shape(2 * radius, 2 * radius){}
+	:m_radius(radius), Shape(2 * radius, 2 * radius) {}
 
 std::string Circle::to_postscript() const
-{ 
-	return "gsave\n" 
-			"newpath \n"
-			"  0 0 " + std::to_string(m_radius) + " 0 360 arc \n"
-			"  stroke \n"
-			"closepath\n"
-			"grestore\n";
+{
+	return "gsave\n"
+		"newpath \n"
+		"  0 0 " + std::to_string(m_radius) + " 0 360 arc \n"
+		"  stroke \n"
+		"closepath\n"
+		"grestore\n";
 }
 
 Polygon::Polygon(int num_sides, double side_length)
 	:m_num_sides(num_sides), m_side_length(side_length), Shape(0, 0)
 {
+	if (num_sides < 3)
+	{
+		throw std::invalid_argument("a polygon cannot have less than 3 sides");
+	}
 	double width;
 	double height;
 	double cos_part = std::cos(M_PI / ((double)num_sides));
@@ -69,41 +73,47 @@ Polygon::Polygon(int num_sides, double side_length)
 
 std::string Polygon::to_postscript() const
 {
-	double y_shift = m_side_length/(2*std::tan(M_PI/(double)m_num_sides));
-	double x_shift = m_side_length/2;
+	double y_shift = m_side_length / (2 * std::tan(M_PI / (double)m_num_sides));
+	double x_shift = m_side_length / 2;
 	return "gsave\n"
-			"0 " + std::to_string(-get_height()/2 + y_shift) + " translate\n" 
-			"0 " + std::to_string(360/(double)m_num_sides) + " 360 {\n"
-			"  newpath\n"
-			"  gsave\n"
-			"    rotate\n"
-			"    -" + std::to_string(x_shift) + " -" + std::to_string(y_shift) + " moveto\n"
-			"    " + std::to_string(x_shift) + " -" + std::to_string(y_shift) + " lineto\n"
-			"    stroke\n"
-			"  grestore\n"
-			"  closepath\n"
-			"}for\n"
-			"grestore\n";
+		"0 " + std::to_string(-get_height() / 2 + y_shift) + " translate\n"
+		"0 " + std::to_string(360 / (double)m_num_sides) + " 360 {\n"
+		"  newpath\n"
+		"  gsave\n"
+		"    rotate\n"
+		"    -" + std::to_string(x_shift) + " -" + std::to_string(y_shift) + " moveto\n"
+		"    " + std::to_string(x_shift) + " -" + std::to_string(y_shift) + " lineto\n"
+		"    stroke\n"
+		"  grestore\n"
+		"  closepath\n"
+		"}for\n"
+		"grestore\n";
 }
 
 std::string Rectangle::to_postscript() const
 {
-		return "gsave\n"
-				"  newpath\n"
-				"  -" + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " moveto\n"
-				"  " + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " lineto\n"
-				"  " + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " moveto\n"
-				"  " + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " lineto\n"
-				"  " + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " moveto\n"
-				"  -" + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " lineto\n"
-				"  -" + std::to_string(get_width()/2) + " " + std::to_string(get_height()/2) + " moveto\n"
-				"  -" + std::to_string(get_width()/2) + " -" + std::to_string(get_height()/2) + " lineto\n"
-				"  closepath\n"
-				"  stroke\n"
-				"Shape.get_width() + 36grestore\n";
+	return "gsave\n"
+		"  newpath\n"
+		"  -" + std::to_string(get_width() / 2) + " -" + std::to_string(get_height() / 2) + " moveto\n"
+		"  " + std::to_string(get_width() / 2) + " -" + std::to_string(get_height() / 2) + " lineto\n"
+		"  " + std::to_string(get_width() / 2) + " -" + std::to_string(get_height() / 2) + " moveto\n"
+		"  " + std::to_string(get_width() / 2) + " " + std::to_string(get_height() / 2) + " lineto\n"
+		"  " + std::to_string(get_width() / 2) + " " + std::to_string(get_height() / 2) + " moveto\n"
+		"  -" + std::to_string(get_width() / 2) + " " + std::to_string(get_height() / 2) + " lineto\n"
+		"  -" + std::to_string(get_width() / 2) + " " + std::to_string(get_height() / 2) + " moveto\n"
+		"  -" + std::to_string(get_width() / 2) + " -" + std::to_string(get_height() / 2) + " lineto\n"
+		"  closepath\n"
+		"  stroke\n"
+		"Shape.get_width() + 36grestore\n";
 }
 
-Rotated::Rotated(std::unique_ptr<Shape> shape, RotationAngle rotation_angle):Shape(0,0), m_rot(rotation_angle), m_shape(shape->clone())
+std::string Spacer::to_postscript() const
+{
+	return "";
+}
+
+Rotated::Rotated(std::shared_ptr<Shape> shape, RotationAngle rotation_angle)
+	:Shape(0, 0), m_rot{ rotation_angle }, m_shape{ std::move(shape) }
 {
 	if (rotation_angle == HALF)
 	{
@@ -117,68 +127,110 @@ Rotated::Rotated(std::unique_ptr<Shape> shape, RotationAngle rotation_angle):Sha
 	}
 }
 
-Rotated::Rotated(const Rotated& shape):Shape(0,0),m_rot(shape.m_rot),m_shape(shape.m_shape->clone()){}
-
 std::string Rotated::to_postscript() const
 {
 	return "gsave\n"
-			+ std::to_string(m_rot) + " rotate\n"
-			+ m_shape->to_postscript()
-			+ "-" + std::to_string(m_rot) + " rotate\n"
-			"grestore\n";
+		+ std::to_string(m_rot) + " rotate\n"
+		+ m_shape->to_postscript()
+		+ "-" + std::to_string(m_rot) + " rotate\n"
+		"grestore\n";
 }
 
-Scaled::Scaled(std::unique_ptr<Shape>shape, double fx, double fy) :
-	Shape(0, 0), m_fx(fx), m_fy(fy), m_shape(shape->clone())
+Scaled::Scaled(std::shared_ptr<Shape> shape, double fx, double fy)
+	:Shape(0, 0), m_shape{ std::move(shape) }, m_fx{ fx }, m_fy{ fy }
 {
-	set_width(m_fx*m_shape->get_width());
-	set_height(m_fy*m_shape->get_height());
-}
-
-Scaled::Scaled(const Scaled & shape):Shape(shape.get_width(),shape.get_height()), m_shape(shape.clone())
-{
-	m_fx = shape.m_fx;
-	m_fy = shape.m_fy;
+	{
+		set_width(m_shape->get_width()*fx);
+		set_height(m_shape->get_height()*fy);
+	}
 }
 
 std::string Scaled::to_postscript() const
 {
 	return "gsave\n"
-			+ std::to_string(m_fx) + " " + std::to_string(m_fy) + " scale\n"
-			+ m_shape->to_postscript()
-			+"grestore\n";
-			
+		+ std::to_string(m_fx) + " " + std::to_string(m_fy) + " scale\n"
+		+ m_shape->to_postscript() +
+		"grestore\n";
 }
 
-Layered::Layered(std::vector<std::unique_ptr<Shape>> shapes):Shape(0,0)
+Layered::Layered(std::initializer_list<std::shared_ptr<Shape>> shapes)
+	:Shape(0, 0), m_shapes(std::move(shapes))
 {
-	double width = 0;
-	double height = 0;
-	for (int i = 0;i < shapes.size();i++)
+	for (unsigned int i = 0; i < m_shapes.size(); ++i)
 	{
-		width = std::max(width, shapes.at(i)->get_width());
-		height = std::max(height, shapes.at(i)->get_width());
-		m_shapes.push_back(std::move(shapes.at(i)));
-	}
-	set_height(height);
-	set_width(width);
-}
-
-Layered::Layered(const Layered & shape) :
-	Shape(shape.get_width(), shape.get_height())
-{
-	for (int i = 0;i < shape.m_shapes.size();i++)
-	{
-		m_shapes.push_back((shape.m_shapes.at(i)->clone()));
+		if (get_width() < m_shapes[i]->get_width())
+			set_width(m_shapes[i]->get_width());
+		if (get_height() < m_shapes[i]->get_height())
+			set_height(m_shapes[i]->get_height());
 	}
 }
 
 std::string Layered::to_postscript() const
 {
-	std::string postscript = "";
-	//for (int i = 0;i < m_shapes.size();i++)
-	//{
-	//	postscript.append(m_shapes.at(i)->to_postscript());
-	//}
-	return postscript;
+	std::cout << get_width() << std::endl;
+	std::cout << get_height() << std::endl;
+	std::string outputString = "";
+	for (unsigned int i = 0; i < m_shapes.size(); ++i)
+	{
+		outputString += "gsave\n" +
+			m_shapes[i]->to_postscript() +
+			"grestore\n";
+	}
+	return outputString;
+}
+
+Virtical::Virtical(std::initializer_list<std::shared_ptr<Shape>> shapes)
+	:Shape(0, 0), m_shapes(std::move(shapes))
+{
+	double total_height = 0;
+	for (unsigned int i = 0; i < m_shapes.size(); ++i)
+	{
+		if (get_width() < m_shapes[i]->get_width())
+			set_width(m_shapes[i]->get_width());
+		total_height += m_shapes[i]->get_height();
+	}
+	set_height(total_height);
+}
+
+std::string Virtical::to_postscript() const
+{
+	std::string outputString = "";
+	double total_height_drawn = 0;
+	for (unsigned int i = 0; i < m_shapes.size(); ++i)
+	{
+		outputString += "gsave\n"
+			"0 " + std::to_string(-get_height() / 2 + m_shapes[i]->get_height() / 2 + total_height_drawn) + " translate\n" +
+			m_shapes[i]->to_postscript() +
+			"grestore\n";
+		total_height_drawn += m_shapes[i]->get_height();
+	}
+	return outputString;
+}
+
+Horizontal::Horizontal(std::initializer_list<std::shared_ptr<Shape>> shapes)
+	:Shape(0, 0), m_shapes(std::move(shapes))
+{
+	double total_width = 0;
+	for (unsigned int i = 0; i < m_shapes.size(); ++i)
+	{
+		if (get_height() < m_shapes[i]->get_height())
+			set_height(m_shapes[i]->get_height());
+		total_width += m_shapes[i]->get_width();
+	}
+	set_width(total_width);
+}
+
+std::string Horizontal::to_postscript() const
+{
+	std::string outputString = "";
+	double total_width_drawn = 0;
+	for (unsigned int i = 0; i < m_shapes.size(); ++i)
+	{
+		outputString += "gsave\n" +
+			std::to_string(-get_width() / 2 + m_shapes[i]->get_width() / 2 + total_width_drawn) + " 0" + " translate\n" +
+			m_shapes[i]->to_postscript() +
+			"grestore\n";
+		total_width_drawn += m_shapes[i]->get_width();
+	}
+	return outputString;
 }

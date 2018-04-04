@@ -309,3 +309,83 @@ std::string Diamond::to_postscript() const
 		"  stroke\n"
 		"grestore\n";
 }
+
+LPB::LPB(double side, int depth): Shape(side, side), m_depth(depth)
+{
+	if (depth == 1)
+	{
+		auto q1 = std::make_unique<U_Curve>(side / 2);
+		auto q2 = std::make_unique<U_Curve>(side / 2);
+		auto q3 = std::make_unique<U_Curve>(side / 2);
+		auto q4 = std::make_unique<U_Curve>(side / 2);
+		m_subLPB.push_back(std::move(q1));
+		m_subLPB.push_back(std::move(q2));
+		m_subLPB.push_back(std::move(q3));
+		m_subLPB.push_back(std::move(q4));
+	}
+	else
+	{
+		auto q1 = std::make_unique<LPB>(side / 2, depth-1);
+		auto q2 = std::make_unique<LPB>(side / 2, depth-1);
+		auto q3 = std::make_unique<LPB>(side / 2, depth-1);
+		auto q4 = std::make_unique<LPB>(side / 2, depth-1);
+		m_subLPB.push_back(std::move(q1));
+		m_subLPB.push_back(std::move(q2));
+		m_subLPB.push_back(std::move(q3));
+		m_subLPB.push_back(std::move(q4));
+
+	}
+}
+
+std::string LPB::to_postscript() const
+{
+	if (m_subLPB.size() == 0)
+	{
+		auto shape = std::make_unique<U_Curve>(get_width());
+		return shape->to_postscript();
+	}
+	return "gsave\n"
+		"-" + std::to_string(get_width() / 4) + " -" + std::to_string(get_height() / 4) + " translate\n"
+		"-90 rotate\n"
+		+ m_subLPB.at(0)->to_postscript() +
+		+"90 rotate\n"
+		"0 " + std::to_string(get_height() / 2) + " translate\n"
+		+ m_subLPB.at(1)->to_postscript() +
+		std::to_string(get_width() / 2) + " 0 translate\n"
+		+ m_subLPB.at(2)->to_postscript() +
+		+"0 -" + std::to_string(get_height() / 2) + " translate\n"
+		+ "90 rotate\n"
+		+ m_subLPB.at(3)->to_postscript() +
+		"-90 rotate\n"
+		"grestore\n"
+		"gsave\n"
+		"newpath\n"
+		"-" + std::to_string(get_width() / 2 - get_width() / (4 * pow(2, m_depth))) +
+		" -" + std::to_string(get_width() / (4 * pow(2, m_depth))) + " moveto\n"
+		"0 " + std::to_string(get_width() / (4 * pow(2, m_depth - 1))) + " rlineto\n"
+		"stroke\n"
+		"newpath\n"
+		"-" + std::to_string(get_width() / (4 * pow(2, m_depth))) +
+		" " + std::to_string(get_width() / (4 * pow(2, m_depth))) + " moveto\n"
+		 + std::to_string(get_width() / (4 * pow(2, m_depth - 1))) + " 0 rlineto\n"
+		"stroke\n"
+		"newpath\n"
+		"" + std::to_string(get_width()/2 - get_width() / (4 * pow(2, m_depth))) +
+		" " + std::to_string(get_width() / (4 * pow(2, m_depth))) + " moveto\n"
+		"0 -" + std::to_string(get_width() / (4 * pow(2, m_depth - 1))) + " rlineto\n"
+		"stroke\n"
+		"grestore\n";
+
+}
+
+std::string U_Curve::to_postscript() const
+{
+	return "gsave\n"
+		"newpath\n"
+		"-" + std::to_string(get_width() / 4) + " -" + std::to_string(get_height() / 4) + " moveto\n"
+		"0 " + std::to_string(get_height() / 2) + " rlineto\n"
+		+ std::to_string(get_width() / 2) + " 0 rlineto\n"
+		"0 -" + std::to_string(get_height() / 2) + " rlineto\n"
+		"stroke\n"
+		"grestore\n";
+}

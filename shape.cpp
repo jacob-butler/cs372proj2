@@ -153,85 +153,85 @@ std::string Scaled::to_postscript() const
 		"grestore\n";
 }
 
-Layered::Layered(std::initializer_list<std::shared_ptr<Shape>> shapes)
-	:Shape(0,0), m_shapes(std::move(shapes))
-{
-	for(unsigned int i = 0; i < m_shapes.size(); ++i)
-	{
-		if(get_width() < m_shapes[i]->get_width())
-			set_width(m_shapes[i]->get_width());
-		if(get_height() < m_shapes[i]->get_height())
-			set_height(m_shapes[i]->get_height());
-	}
-}
+Composite::Composite(std::initializer_list<std::shared_ptr<Shape>> shapes)
+	:Shape(0,0), m_shapes(std::move(shapes)){};
 
-std::string Layered::to_postscript() const
+std::string Composite::to_postscript() const
 {
-	std::cout << get_width() << std::endl;
-	std::cout << get_height() << std::endl;
 	std::string outputString = "";
+	double total_height_drawn = 0;
+	double total_width_drawn = 0;
 	for(unsigned int i = 0; i < m_shapes.size(); ++i)
 	{
-		outputString += "gsave\n" +
-			m_shapes[i]->to_postscript() +
-			"grestore\n";
+		outputString += "gsave\n" 
+		+ move_to_draw_position(i, total_height_drawn, total_width_drawn) +
+		"grestore\n";
 	}
 	return outputString;
 }
 
+std::vector<std::shared_ptr<Shape>> Composite::getShapes() const
+{
+	return m_shapes;
+}
+
+Layered::Layered(std::initializer_list<std::shared_ptr<Shape>> shapes)
+	:Composite{shapes}
+{
+	for(unsigned int i = 0; i < getShapes().size(); ++i)
+	{
+		if(get_width() < getShapes()[i]->get_width())
+			set_width(getShapes()[i]->get_width());
+		if(get_height() < getShapes()[i]->get_height())
+			set_height(getShapes()[i]->get_height());
+	}
+}
+
+std::string Layered::move_to_draw_position(int index, double & width, double & height) const
+{
+	return getShapes()[index]->to_postscript();
+}
+
 Virtical::Virtical(std::initializer_list<std::shared_ptr<Shape>> shapes)
-	:Shape(0,0), m_shapes(std::move(shapes))
+	:Composite{shapes}
 {
 	double total_height = 0;
-	for(unsigned int i = 0; i < m_shapes.size(); ++i)
+	for(unsigned int i = 0; i < getShapes().size(); ++i)
 	{
-		if(get_width() < m_shapes[i]->get_width())
-			set_width(m_shapes[i]->get_width());
-		total_height += m_shapes[i]->get_height();
+		if(get_width() < getShapes()[i]->get_width())
+			set_width(getShapes()[i]->get_width());
+		total_height += getShapes()[i]->get_height();
 	}
 	set_height(total_height);
 }
 
-std::string Virtical::to_postscript() const
+std::string Virtical::move_to_draw_position(int index, double & width, double & height) const
 {
-	std::string outputString = "";
-	double total_height_drawn = 0;
-	for(unsigned int i = 0; i < m_shapes.size(); ++i)
-	{
-		outputString += "gsave\n" 
-		"0 " + std::to_string(-get_height()/2 + m_shapes[i]->get_height()/2+total_height_drawn) + " translate\n" +
-		m_shapes[i]->to_postscript() +
-		"grestore\n";
-		total_height_drawn += m_shapes[i]->get_height();
-	}
+	auto outputString = "0 " + std::to_string(-get_height()/2 + getShapes()[index]->get_height()/2+height) + 
+	                    " translate\n" + getShapes()[index]->to_postscript();
+
+	height += getShapes()[index]->get_height();
 	return outputString;
 }
 
 Horizontal::Horizontal(std::initializer_list<std::shared_ptr<Shape>> shapes)
-	:Shape(0,0), m_shapes(std::move(shapes))
+	:Composite{shapes}
 {
 	double total_width = 0;
-	for(unsigned int i = 0; i < m_shapes.size(); ++i)
+	for(unsigned int i = 0; i < getShapes().size(); ++i)
 	{
-		if(get_height() < m_shapes[i]->get_height())
-			set_height(m_shapes[i]->get_height());
-		total_width += m_shapes[i]->get_width();
+		if(get_height() < getShapes()[i]->get_height())
+			set_height(getShapes()[i]->get_height());
+		total_width += getShapes()[i]->get_width();
 	}
 	set_width(total_width);
 }
 
-std::string Horizontal::to_postscript() const
+std::string Horizontal::move_to_draw_position(int index, double & width, double & height) const
 {
-	std::string outputString = "";
-	double total_width_drawn = 0;
-	for(unsigned int i = 0; i < m_shapes.size(); ++i)
-	{
-		outputString += "gsave\n" +
-		std::to_string(-get_width()/2 + m_shapes[i]->get_width()/2+total_width_drawn) + " 0" + " translate\n" +
-		m_shapes[i]->to_postscript() +
-		"grestore\n";
-		total_width_drawn += m_shapes[i]->get_width();
-	}
+	auto outputString = std::to_string(-get_width()/2 + getShapes()[index]->get_width()/2+width) + 
+	                    " 0" + " translate\n" + getShapes()[index]->to_postscript();
+	width += getShapes()[index]->get_width();
 	return outputString;
 }
 
